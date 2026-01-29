@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SIEM Security Dashboard - Rule Management</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border-bottom: 2px solid #d4af37;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav a {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .nav a:hover {
+            color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .nav a.logout {
+            color: #ff6b6b;
+        }
+
+        .nav a.logout:hover {
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 20px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid #00d4ff;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-add {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: #d4af37;
+            color: #d4af37;
+        }
+
+        .btn-add:hover {
+            background: rgba(212, 175, 55, 0.2);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border: 1px solid #00d4ff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #0a0e27 0%, #0f1a3b 100%);
+            color: #d4af37;
+            padding: 16px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            border-bottom: 2px solid #d4af37;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #00d4ff;
+            font-size: 13px;
+        }
+
+        tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-enabled {
+            background: rgba(0, 212, 255, 0.15);
+            color: #00d4ff;
+            border: 1px solid #00d4ff;
+        }
+
+        .status-disabled {
+            background: rgba(150, 150, 150, 0.15);
+            color: #999;
+            border: 1px solid #999;
+        }
+
+        .severity-HIGH {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .severity-MEDIUM {
+            color: #ffa500;
+            font-weight: 600;
+        }
+
+        .severity-LOW {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .action-link {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 6px 10px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            margin-right: 5px;
+        }
+
+        .action-link:hover {
+            background: rgba(0, 212, 255, 0.2);
+            color: #d4af37;
+        }
+
+        .action-link.disable {
+            color: #ffa500;
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid #ffa500;
+        }
+
+        .action-link.disable:hover {
+            background: rgba(255, 165, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">⚔️ SIEM</div>
+                <div class="nav">
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/alerts">Alerts</a>
+                    <a href="/logs">Logs</a>
+                    {% if current_user.role == 'admin' %}
+                    <a href="/admin/rules">Rules</a>
+                    <a href="/admin/users">Users</a>
+                    {% endif %}
+                    <div class="user-info">
+                        👤 <strong>{{ current_user.username }}</strong> | {{ current_user.role }}
+                    </div>
+                    <a href="/logout" class="logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="toolbar">
+            <div class="section-title">📋 Detection Rules</div>
+            <div>
+                <a href="/admin/rules/add" class="btn btn-add">+ Add New Rule</a>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Rule Name</th>
+                    <th>Log Field</th>
+                    <th>Match Type</th>
+                    <th>Value</th>
+                    <th>Threshold</th>
+                    <th>Time Window</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rules %}
+                <tr>
+                    <td>#{{ r.id }}</td>
+                    <td>{{ r.rule_name }}</td>
+                    <td>{{ r.log_field }}</td>
+                    <td>{{ r.match_type }}</td>
+                    <td><code style="background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 3px;">{{ r.match_value }}</code></td>
+                    <td>{{ r.threshold }}</td>
+                    <td>{{ r.time_window_minutes }}m</td>
+                    <td class="severity-{{ r.severity }}">{{ r.severity }}</td>
+                    <td>
+                        <span class="status-badge {% if r.enabled %}status-enabled{% else %}status-disabled{% endif %}">
+                            {{ "Active" if r.enabled else "Inactive" }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if r.enabled %}
+                        <a href="/admin/rules/disable/{{ r.id }}" class="action-link disable">✕ Disable</a>
+                        {% else %}
+                        <a href="/admin/rules/enable/{{ r.id }}" class="action-link">✓ Enable</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

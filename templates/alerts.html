@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SIEM Security Dashboard - Alerts</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border-bottom: 2px solid #d4af37;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav a {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .nav a:hover {
+            color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .nav a.logout {
+            color: #ff6b6b;
+        }
+
+        .nav a.logout:hover {
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .user-info {
+            color: #00d4ff;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .user-info strong {
+            color: #d4af37;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border: 1px solid #00d4ff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #00d4ff;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #d4af37;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #00d4ff;
+        }
+
+        .admin-panel {
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 30px;
+        }
+
+        .admin-panel a {
+            color: #d4af37;
+            text-decoration: none;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .admin-panel a:hover {
+            background: rgba(212, 175, 55, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border: 1px solid #00d4ff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #0a0e27 0%, #0f1a3b 100%);
+            color: #d4af37;
+            padding: 16px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            border-bottom: 2px solid #d4af37;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #00d4ff;
+            font-size: 13px;
+        }
+
+        tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .severity-HIGH {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .severity-MEDIUM {
+            color: #ffa500;
+            font-weight: 600;
+        }
+
+        .severity-LOW {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-OPEN {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+
+        .status-CLOSED {
+            background: rgba(0, 212, 255, 0.15);
+            color: #00d4ff;
+            border: 1px solid #00d4ff;
+        }
+
+        .action-link {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 6px 10px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .action-link:hover {
+            background: rgba(0, 212, 255, 0.2);
+            color: #d4af37;
+        }
+
+        .filter-section {
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border: 1px solid #00d4ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            color: #d4af37;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .filter-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-item label {
+            color: #00d4ff;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .filter-item input,
+        .filter-item select {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #00d4ff;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 12px;
+        }
+
+        .filter-item select option {
+            background: #1a2a4a;
+            color: #e0e0e0;
+        }
+
+        .filter-item select option:checked {
+            background: linear-gradient(#00d4ff, #00d4ff);
+            background-color: #00d4ff;
+            color: #0a0e27;
+        }
+
+        .filter-item input:focus,
+        .filter-item select:focus {
+            outline: none;
+            background: rgba(0, 212, 255, 0.05);
+            border-color: #d4af37;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid #00d4ff;
+            color: #00d4ff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .filter-btn.reset {
+            background: rgba(255, 107, 107, 0.1);
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .filter-btn.reset:hover {
+            background: rgba(255, 107, 107, 0.2);
+        }
+
+        .counter-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .counter-card {
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .counter-label {
+            color: #00d4ff;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .counter-value {
+            color: #d4af37;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">⚔️ SIEM</div>
+                <div class="nav">
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/alerts">Alerts</a>
+                    <a href="/logs">Logs</a>
+                    {% if current_user.role == 'admin' %}
+                    <a href="/admin/rules">Rules</a>
+                    <a href="/admin/users">Users</a>
+                    {% endif %}
+                    <div class="user-info">
+                        👤 <strong>{{ current_user.username }}</strong> | {{ current_user.role }}
+                    </div>
+                    <a href="/logout" class="logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        {% if current_user.role == "admin" %}
+        <div class="admin-panel">
+            <strong style="color: #d4af37; text-transform: uppercase; letter-spacing: 1px;">Admin Panel:</strong>
+            <a href="/admin/rules">📋 Rule Management</a>
+        </div>
+        {% endif %}
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-title">🔍 Filter Alerts</div>
+            <form method="GET" id="filterForm">
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <label for="severity">Severity Level</label>
+                        <select name="severity" id="severity">
+                            <option value="">All Levels</option>
+                            <option value="CRITICAL">CRITICAL</option>
+                            <option value="HIGH">HIGH</option>
+                            <option value="MEDIUM">MEDIUM</option>
+                            <option value="LOW">LOW</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="status">Status</label>
+                        <select name="status" id="status">
+                            <option value="">All Status</option>
+                            <option value="OPEN">Open</option>
+                            <option value="INVESTIGATING">Investigating</option>
+                            <option value="RESOLVED">Resolved</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="search">Search (IP/Message)</label>
+                        <input type="text" name="search" id="search" placeholder="Enter IP or keyword...">
+                    </div>
+                    <div class="filter-item">
+                        <label for="dateFrom">From Date</label>
+                        <input type="date" name="dateFrom" id="dateFrom">
+                    </div>
+                    <div class="filter-item">
+                        <label for="dateTo">To Date</label>
+                        <input type="date" name="dateTo" id="dateTo">
+                    </div>
+                </div>
+                <div class="filter-buttons">
+                    <button type="submit" class="filter-btn">Apply Filters</button>
+                    <button type="reset" class="filter-btn reset">Clear All</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="section-title">Security Alerts</div>
+
+        <!-- Counter Section -->
+        <div class="counter-section">
+            <div class="counter-card">
+                <div class="counter-label">Total Alerts</div>
+                <div class="counter-value">{{ total }}</div>
+            </div>
+            <div class="counter-card">
+                <div class="counter-label">Open Alerts</div>
+                <div class="counter-value">{{ open_count }}</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Rule Name</th>
+                    <th>Severity</th>
+                    <th>Detection Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alert in alerts %}
+                <tr>
+                    <td>#{{ alert.id }}</td>
+                    <td>{{ alert.rule_name }}</td>
+                    <td class="severity-{{ alert.severity }}">{{ alert.severity }}</td>
+                    <td>{{ alert.created_time }}</td>
+                    <td>
+                        <span class="status-badge status-{{ alert.status }}">
+                            {{ alert.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if alert.status == "OPEN" %}
+                        <a href="/close_alert/{{ alert.id }}" class="action-link">✓ Close</a>
+                        {% else %}
+                        <span style="color: #666; font-size: 11px;">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

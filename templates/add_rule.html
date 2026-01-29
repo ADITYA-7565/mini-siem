@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SIEM Security Dashboard - Add Rule</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border-bottom: 2px solid #d4af37;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #00d4ff;
+        }
+
+        .form-container {
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border: 1px solid #00d4ff;
+            border-radius: 8px;
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d4af37;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #00d4ff;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            background: rgba(0, 212, 255, 0.05);
+            border-color: #d4af37;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            background: #1a2a4a;
+            color: #e0e0e0;
+        }
+
+        select option:checked {
+            background: linear-gradient(#00d4ff, #00d4ff);
+            background-color: #00d4ff;
+            color: #0a0e27;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        button,
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(135deg, #d4af37 0%, #ffd700 100%);
+            color: #0a0e27;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-back {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+            border: 1px solid #00d4ff;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .nav a {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .nav a:hover {
+            color: #d4af37;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">⚔️ SIEM</div>
+                <div class="nav">
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/alerts">Alerts</a>
+                    <a href="/logs">Logs</a>
+                    {% if current_user.role == 'admin' %}
+                    <a href="/admin/rules">Rules</a>
+                    <a href="/admin/users">Users</a>
+                    {% endif %}
+                    <div class="user-info">
+                        👤 <strong>{{ current_user.username }}</strong> | {{ current_user.role }}
+                    </div>
+                    <a href="/logout" class="logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section-title">➕ Create Detection Rule</div>
+
+        <div class="form-container">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="rule_name">Rule Name</label>
+                    <input type="text" id="rule_name" name="rule_name" placeholder="e.g., Suspicious Admin Access" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="log_field">Log Field to Monitor</label>
+                    <select id="log_field" name="log_field" required>
+                        <option value="">-- Select Field --</option>
+                        <option value="message">Message</option>
+                        <option value="source">Source</option>
+                        <option value="level">Level</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="match_type">Match Type</label>
+                    <select id="match_type" name="match_type" required>
+                        <option value="">-- Select Type --</option>
+                        <option value="equals">Equals</option>
+                        <option value="contains">Contains</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="match_value">Match Value</label>
+                    <input type="text" id="match_value" name="match_value" placeholder="e.g., /admin/dashboard" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="threshold">Threshold (occurrences)</label>
+                    <input type="number" id="threshold" name="threshold" min="1" placeholder="e.g., 5" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="time_window">Time Window (minutes)</label>
+                    <input type="number" id="time_window" name="time_window" min="1" placeholder="e.g., 10" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="severity">Severity Level</label>
+                    <select id="severity" name="severity" required>
+                        <option value="">-- Select Severity --</option>
+                        <option value="LOW">Low</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="HIGH">High</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit">✓ Create Rule</button>
+                    <a href="/admin/rules" class="btn btn-back">← Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

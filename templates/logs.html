@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SIEM Security Dashboard - Logs</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border-bottom: 2px solid #d4af37;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav a {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .nav a:hover {
+            color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .nav a.logout {
+            color: #ff6b6b;
+        }
+
+        .nav a.logout:hover {
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #00d4ff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border: 1px solid #00d4ff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #0a0e27 0%, #0f1a3b 100%);
+            color: #d4af37;
+            padding: 16px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            border-bottom: 2px solid #d4af37;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #00d4ff;
+            font-size: 13px;
+        }
+
+        tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .log-level {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .level-INFO {
+            background: rgba(0, 212, 255, 0.15);
+            color: #00d4ff;
+            border: 1px solid #00d4ff;
+        }
+
+        .level-WARNING {
+            background: rgba(255, 165, 0, 0.15);
+            color: #ffa500;
+            border: 1px solid #ffa500;
+        }
+
+        .level-ERROR {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+
+        .level-CRITICAL {
+            background: rgba(255, 0, 0, 0.15);
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+
+        .ip-address {
+            color: #d4af37;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        .message {
+            color: #00d4ff;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+
+        .timestamp {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .filter-section {
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border: 1px solid #00d4ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            color: #d4af37;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .filter-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-item label {
+            color: #00d4ff;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .filter-item input,
+        .filter-item select {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #00d4ff;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 12px;
+        }
+
+        .filter-item select option {
+            background: #1a2a4a;
+            color: #e0e0e0;
+        }
+
+        .filter-item select option:checked {
+            background: linear-gradient(#00d4ff, #00d4ff);
+            background-color: #00d4ff;
+            color: #0a0e27;
+        }
+
+        .filter-item input:focus,
+        .filter-item select:focus {
+            outline: none;
+            background: rgba(0, 212, 255, 0.05);
+            border-color: #d4af37;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid #00d4ff;
+            color: #00d4ff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .filter-btn.reset {
+            background: rgba(255, 107, 107, 0.1);
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .filter-btn.reset:hover {
+            background: rgba(255, 107, 107, 0.2);
+        }
+
+        .counter-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .counter-card {
+            background: linear-gradient(135deg, #0f1a3b 0%, #1a2a4a 100%);
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .counter-label {
+            color: #00d4ff;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .counter-value {
+            color: #d4af37;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">⚔️ SIEM</div>
+                <div class="nav">
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/alerts">Alerts</a>
+                    <a href="/logs">Logs</a>
+                    {% if current_user.role == 'admin' %}
+                    <a href="/admin/rules">Rules</a>
+                    <a href="/admin/users">Users</a>
+                    {% endif %}
+                    <div class="user-info">
+                        👤 <strong>{{ current_user.username }}</strong> | {{ current_user.role }}
+                    </div>
+                    <a href="/logout" class="logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section-title">📊 System Logs</div>
+
+        <!-- Counter Section -->
+        <div class="counter-section">
+            <div class="counter-card">
+                <div class="counter-label">Total Logs</div>
+                <div class="counter-value">{{ logs|length }}</div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-title">🔍 Filter Logs</div>
+            <form method="GET" id="filterForm">
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <label for="level">Log Level</label>
+                        <select name="level" id="level">
+                            <option value="">All Levels</option>
+                            <option value="INFO">INFO</option>
+                            <option value="WARNING">WARNING</option>
+                            <option value="ERROR">ERROR</option>
+                            <option value="CRITICAL">CRITICAL</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="source">Source</label>
+                        <select name="source" id="source">
+                            <option value="">All Sources</option>
+                            <option value="system">System</option>
+                            <option value="detector">Detector</option>
+                            <option value="database">Database</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="ip">IP Address</label>
+                        <input type="text" name="ip" id="ip" placeholder="Search IP...">
+                    </div>
+                    <div class="filter-item">
+                        <label for="search">Search Message</label>
+                        <input type="text" name="search" id="search" placeholder="Enter keyword...">
+                    </div>
+                    <div class="filter-item">
+                        <label for="dateFrom">From Date</label>
+                        <input type="date" name="dateFrom" id="dateFrom">
+                    </div>
+                    <div class="filter-item">
+                        <label for="dateTo">To Date</label>
+                        <input type="date" name="dateTo" id="dateTo">
+                    </div>
+                </div>
+                <div class="filter-buttons">
+                    <button type="submit" class="filter-btn">Apply Filters</button>
+                    <button type="reset" class="filter-btn reset">Clear All</button>
+                </div>
+            </form>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Source</th>
+                    <th>Level</th>
+                    <th>IP Address</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td class="timestamp">{{ log.log_time }}</td>
+                    <td>{{ log.source }}</td>
+                    <td>
+                        <span class="log-level level-{{ log.level }}">
+                            {{ log.level }}
+                        </span>
+                    </td>
+                    <td class="ip-address">{{ log.ip_address }}</td>
+                    <td class="message">{{ log.message }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
